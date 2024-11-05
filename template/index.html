@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask アプリ</title>
+</head>
+<body>
+    <h1>シートとトレーナーを選択</h1>
+    <form action="/generate_html" method="post">
+        <label for="spreadsheet_id">スプレッドシートID:</label>
+        <input type="text" id="spreadsheet_id" name="spreadsheet_id">
+
+        <label for="sheet_name">シート:</label>
+        <select id="sheet_name" name="sheet_name">
+            {% for sheet in sheet_names %}
+            <option value="{{ sheet }}">{{ sheet }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="trainer_name">トレーナー:</label>
+        <select id="trainer_name" name="trainer_name">
+            <!-- JavaScriptでオプションを動的に追加 -->
+        </select>
+
+        <button type="submit">HTML生成</button>
+    </form>
+
+    <script>
+        document.getElementById('sheet_name').addEventListener('change', function() {
+            const sheetName = this.value;
+            const spreadsheetId = document.getElementById('spreadsheet_id').value;
+            fetch(`/get_trainers?spreadsheet_id=${spreadsheetId}&sheet_name=${sheetName}`)
+                .then(response => response.json())
+                .then(data => {
+                    const trainerSelect = document.getElementById('trainer_name');
+                    trainerSelect.innerHTML = '';
+                    data.trainers.forEach(trainer => {
+                        const option = document.createElement('option');
+                        option.value = trainer;
+                        option.textContent = trainer;
+                        trainerSelect.appendChild(option);
+                    });
+                });
+        });
+    </script>
+</body>
+</html>
