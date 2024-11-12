@@ -16,6 +16,7 @@
             padding: 1em;
             border: 1px solid #dee2e6;
             border-radius: 0.25rem;
+            font-size: small;
         }
     </style>
     <script>
@@ -34,7 +35,7 @@
         
         <!-- 表示用エリア -->
         <div class="display-area">
-            <h2>表示されたHTML</h2>
+            <h2>{{ sheet_name }}地方 {{ trainer_name }}</h2>
             <!-- 実際のHTMLを表示 -->
             {{ html_output|safe }}
         </div>
