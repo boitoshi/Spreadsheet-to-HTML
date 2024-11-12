@@ -29,8 +29,8 @@ def index():
 
 @app.route('/get_trainers', methods=['POST'])
 def get_trainers():
+    data = request.get_json()
     sheet_name = request.form['sheet_name']
-
     try:
         # ダミーデータの読み込み
         with open('sample-ELITE4.json', 'r', encoding='utf-8') as f:
@@ -46,50 +46,50 @@ def get_trainers():
 
     return jsonify(trainers)
 
-@app.route('/generate_html', methods=['POST'])
-def generate_html():
+@app.route('/', methods=["GET", "POST"])
+def new_index():
     stylesheet = """
-    <style>
-    .table-elite-four {
-    width: auto; /* ブラウザに合わせて適度に */
-    max-width: 100%; /* 最大幅を100%に */
-    border-collapse: collapse;
-    font-size: 12px; /* テキストサイズを12pxに */
-    margin: 0 auto; /* 中央揃え */
-    }
+<style>
+.table-elite-four {
+width: auto; /* ブラウザに合わせて適度に */
+max-width: 100%; /* 最大幅を100%に */
+border-collapse: collapse;
+font-size: 12px; /* テキストサイズを12pxに */
+margin: 0 auto; /* 中央揃え */
+}
 
-    .table-elite-four th, .table-elite-four td {
-    border: 1px solid #000; /* 罫線1px */
-    padding: 8px;
-    }
+.table-elite-four th, .table-elite-four td {
+border: 1px solid #000; /* 罫線1px */
+padding: 8px;
+}
 
-    .table-elite-four th {
-    background-color: #ffbd59;
-    text-align: center;
-    }
+.table-elite-four th {
+background-color: #ffbd59;
+text-align: center;
+}
 
-    .table-elite-four td {
-    background-color: #fffaf2;
-    }
+.table-elite-four td {
+background-color: #fffaf2;
+}
 
-    td ul {
-    margin: 0;
-    padding-left: 0;  /* 左側のパディングをリセット */
-    list-style-position: inside;  /* リストのマーカー（•など）をテキストの内側に表示 */
-    }
+td ul {
+margin: 0;
+padding-left: 0;  /* 左側のパディングをリセット */
+list-style-position: inside;  /* リストのマーカー（•など）をテキストの内側に表示 */
+}
 
-    @media screen and (max-width: 600px) {
-    .table-elite-four {
-    width: 100%; /* モバイルでは幅を100%に */
-    font-size: 10px; /* テキストサイズを小さく */
-    }
+@media screen and (max-width: 600px) {
+.table-elite-four {
+width: 100%; /* モバイルでは幅を100%に */
+font-size: 10px; /* テキストサイズを小さく */
+}
 
-    .table-elite-four th, .table-elite-four td {
-    padding: 4px; /* パディングを小さく */
-    }
-    }
-    </style>
-    """
+.table-elite-four th, .table-elite-four td {
+padding: 4px; /* パディングを小さく */
+}
+}
+</style>
+"""
     try:
         # ダミーデータの読み込み
         with open('sample-ELITE4.json', 'r', encoding='utf-8') as f:
@@ -171,7 +171,7 @@ def generate_html():
         return redirect(url_for('index'))
 
     pretty_html_output = pretty_html_output + stylesheet
-    return render_template('result.html', html_output=pretty_html_output, sheet_name=sheet_name, trainer_name=trainer_name)
+    return render_template('index.html', html_output=pretty_html_output, sheet_name=sheet_name, trainer_name=trainer_name)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -2,12 +2,63 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask アプリ</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <style>
+        .display-area, .copy-area {
+            margin-bottom: 2em;
+        }
+        .copy-area pre {
+            max-height: 300px; /* 高さを調整 */
+            overflow-x: auto;  /* 横スクロールを有効に */
+            background-color: #f8f9fa; /* Bootstrapのbg-lightに相当 */
+            padding: 1em;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            font-size: small;
+        }
+    </style>
+    <script>
+        // コピーボタンを押した時にコードをコピーする関数
+        function copyCode() {
+            const codeBlock = document.getElementById('code-block');
+            if (codeBlock) {
+                navigator.clipboard.writeText(codeBlock.innerText)
+                    .then(() => alert('HTMLコードをコピーしました！'))
+                    .catch((err) => console.error('コピーに失敗しました:', err));
+            } else {
+                console.error('code-block element not found');
+            }
+        }
+
+        // シート名が変更されたときにトレーナー名を取得する関数
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('sheet_name').addEventListener('change', function() {
+                var sheetName = this.value;
+                $.ajax({
+                    type: 'POST',
+                    url: '/get_trainers',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ sheet_name: sheetName }),
+                    success: function(trainers) {
+                        var trainerSelect = document.getElementById('trainer_name');
+                        trainerSelect.innerHTML = '';
+                        trainers.forEach(function(trainer) {
+                            var option = document.createElement('option');
+                            option.value = trainer;
+                            option.textContent = trainer;
+                            trainerSelect.appendChild(option);
+                        });
+                    }
+                });
+            });
+        });   
+    </script>
 </head>
 <body>
     <h1>シートとトレーナーを選択</h1>
-    <form action="/generate_html" method="post">
+    <form action="/" method="post">
         <label for="sheet_name">シート:</label>
         <select id="sheet_name" name="sheet_name">
             {% for sheet in sheet_names %}
@@ -16,11 +67,10 @@
         </select>
 
         <label for="trainer_name">トレーナー:</label>
-        <select id="trainer_name" name="trainer_name">
-            <!-- JavaScriptでオプションを動的に追加 -->
+        <select id="trainer_name" name="trainer_name" required>
+            <!-- トレーナー名のオプションがここに追加されます -->
         </select>
-
-        <button type="submit">HTML生成</button>
+        <button type="submit">HTMLを生成</button>
     </form>
 
     <script>
@@ -29,7 +79,8 @@
             $.ajax({
                 type: 'POST',
                 url: '/get_trainers',
-                data: { sheet_name: sheetName },
+                contentType: 'application/json',
+                data: JSON.stringify({ sheet_name: sheetName }),
                 success: function(trainers) {
                     var trainerSelect = document.getElementById('trainer_name');
                     trainerSelect.innerHTML = '';
@@ -43,5 +94,32 @@
             });
         });
     </script>
+
+    <!-- 結果表示用のエリア -->
+    <div id="result">
+        {% if result %}
+            <h2>出力結果</h2>
+            <pre>{{ result }}</pre>
+                <!-- 表示用エリア -->
+                <div class="display-area">
+                    {% if html_output %}
+                    <h2>{{ sheet_name }}地方 {{ trainer_name }}</h2>
+                    <!-- 実際のHTMLを表示 -->
+                    {{ html_output|safe }}
+                    {% endif %}
+                </div>
+        
+                <!-- コピー用エリア -->
+                <div class="copy-area">
+                    {% if html_output %}
+                    <h2>HTMLコードをコピー</h2>
+                    <button class="btn btn-primary mb-2" onclick="copyCode()">このコードをコピーする</button>
+                    <pre><code id="code-block">{{ html_output|e }}</code></pre>
+                    {% endif %}
+                </div>
+        {% else %}
+            <p>結果はまだ表示されていません。</p>
+        {% endif %}
+    </div>
 </body>
 </html>
