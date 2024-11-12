@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <title>トレーナーのデータ</title>
+    <style>
+        .display-area, .copy-area {
+            margin-bottom: 2em;
+        }
+        .copy-area pre {
+            max-height: 300px; /* 高さを調整 */
+            overflow-x: auto;  /* 横スクロールを有効に */
+            background-color: #f8f9fa; /* Bootstrapのbg-lightに相当 */
+            padding: 1em;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+    </style>
+    <script>
+        // コピーボタンを押した時にコードをコピーする関数
+        function copyCode() {
+            const codeBlock = document.getElementById('code-block');
+            navigator.clipboard.writeText(codeBlock.innerText)
+                .then(() => alert('HTMLコードをコピーしました！'))
+                .catch((err) => console.error('コピーに失敗しました:', err));
+        }
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">トレーナーのデータ</h1>
+        
+        <!-- 表示用エリア -->
+        <div class="display-area">
+            <h2>表示されたHTML</h2>
+            <!-- 実際のHTMLを表示 -->
+            {{ html_output|safe }}
+        </div>
+
+        <!-- コピー用エリア -->
+        <div class="copy-area">
+            <h2>HTMLコードをコピー</h2>
+            <button class="btn btn-primary mb-2" onclick="copyCode()">このコードをコピーする</button>
+            <pre><code id="code-block">{{ html_output|e }}</code></pre>
+        </div>
+    </div>
+</body>
+</html>
+
