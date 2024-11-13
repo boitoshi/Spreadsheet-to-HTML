@@ -30,24 +30,26 @@ def index():
 @app.route('/get_trainers', methods=['POST'])
 def get_trainers():
     data = request.get_json()
-    sheet_name = request.form['sheet_name']
+    sheet_name = data.get('sheet_name')
+    
+    if not sheet_name:
+        return jsonify({'error': 'シート名が指定されていません。'}), 400
+    
     try:
         # ダミーデータの読み込み
         with open('sample-ELITE4.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-
+            data_file = json.load(f)
         # 選択されたシート名に対応するトレーナー名のリストを取得
-        trainers = list(set(entry['トレーナー'] for entry in data[sheet_name]))
+        trainers = list(set(entry['トレーナー'] for entry in data_file[sheet_name]))
+        return jsonify(trainers)
 
     except FileNotFoundError:
         return jsonify({'error': 'データファイルが見つかりませんでした。'}), 404
-    except json.JSONDecodeError:
-        return jsonify({'error': 'データファイルの読み込みに失敗しました。'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-    return jsonify(trainers)
-
-@app.route('/', methods=["GET", "POST"])
-def new_index():
+@app.route('/generate_html', methods=["GET", "POST"])
+def generate_html():
     stylesheet = """
 <style>
 .table-elite-four {
@@ -56,6 +58,7 @@ max-width: 100%; /* 最大幅を100%に */
 border-collapse: collapse;
 font-size: 12px; /* テキストサイズを12pxに */
 margin: 0 auto; /* 中央揃え */
+text-align: center;
 }
 
 .table-elite-four th, .table-elite-four td {
@@ -65,7 +68,6 @@ padding: 8px;
 
 .table-elite-four th {
 background-color: #ffbd59;
-text-align: center;
 }
 
 .table-elite-four td {
@@ -103,75 +105,69 @@ padding: 4px; /* パディングを小さく */
         filtered_data = [entry for entry in data[sheet_name] if entry['トレーナー'] == trainer_name]
 
         if not filtered_data:
-            flash('指定されたトレーナーのデータが見つかりませんでした。')
-            return redirect(url_for('index'))
+            return jsonify({'html_output': '<p>指定されたトレーナーのデータが見つかりませんでした。</p>'})
 
         # HTMLテーブルを生成
-        # html_output = f"<h2>{trainer_name}</h2>\n"
-        html_output = "<table class='table-elite-four'><tbody>\n"
+        # html_output = f"<h2>{trainer_name}</h2>"
+        html_output = "<table class='table-elite-four'><tbody>"
 
         # ポケモン名と性別
-        html_output += "<tr>\n"
+        html_output += "<tr>"
         for entry in filtered_data:
             pokemon = entry['ポケモン']
             gender = entry.get('せいべつ', '')
             if gender:
-                pokemon += f" ({gender})"
-            html_output += f"    <th><alt='{pokemon}'></th>\n"
-        html_output += "</tr>\n"
+                pokemon += f"({gender})"
+            html_output += f"<th><img src='path/to/{pokemon}.png alt='{pokemon}'></th>" # シングルクォートとダブルクォートの組み合わせ
+        html_output += "</tr>"
 
         # ポケモン名と性別（セル内）
-        html_output += "<tr>\n"
+        html_output += "<tr>"
         for entry in filtered_data:
             pokemon = entry['ポケモン']
             gender = entry.get('せいべつ', '')
             if gender:
-                pokemon += f" ({gender})"
-            html_output += f"    <td align='center'>{pokemon}</td>\n"
-        html_output += "</tr>\n"
+                pokemon += f"({gender})"
+            html_output += f"<td>{pokemon}</td>"
+        html_output += "</tr>"
 
         # レベル
-        html_output += "<tr>\n"
+        html_output += "<tr>"
         for entry in filtered_data:
             level = entry['レベル']
-            html_output += f"    <td align='center'>Lv.{level}</td>\n"
-        html_output += "</tr>\n"
+            html_output += f"<td>{level}</td>"
+        html_output += "</tr>"
 
         # とくせい（なかったら表示しない）
         abilities_exist = any('とくせい' in entry for entry in filtered_data)
         if abilities_exist:
-            html_output += "<tr>\n"
+            html_output += "<tr>"
             for entry in filtered_data:
                 ability = entry.get('とくせい', '')
-                html_output += f"    <td align='center'>{ability}</td>\n"
-            html_output += "</tr>\n"
+                html_output += f"<td>{ability}</td>"
+            html_output += "</tr>"
 
         # わざ
-        html_output += "<tr>\n"
+        html_output += "<tr>"
         for entry in filtered_data:
-            html_output += "    <td><ul>\n"
+            html_output += "<td><ul>"
             for i in range(1, 5):
                 move = entry.get(f'わざ{i}', '')
                 if move:
-                    html_output += f"        <li>{move}</li>\n"
-            html_output += "    </ul></td>\n"
-        html_output += "</tr>\n"
+                    html_output += f"<li>{move}</li>"
+            html_output += "</ul></td>"
+        html_output += "</tr>"
 
-        html_output += "</tbody></table>\n"
+        html_output += "</tbody></table>"
 
-        # BeautifulSoupで整形
+        # BeautifulSoupで整形　prettify()でインデントを整える
         soup = BeautifulSoup(html_output, 'html.parser')
-        pretty_html_output = soup.prettify()
+        pretty_html_output = soup.prettify() + stylesheet
 
-    except FileNotFoundError:
-        flash('データファイルが見つかりませんでした。')
-        return redirect(url_for('index'))
-    except json.JSONDecodeError:
-        flash('データファイルの読み込みに失敗しました。')
-        return redirect(url_for('index'))
+        return jsonify({'html_output': pretty_html_output})
 
-    pretty_html_output = pretty_html_output + stylesheet
-    return render_template('index.html', html_output=pretty_html_output, sheet_name=sheet_name, trainer_name=trainer_name)
-
+    except Exception as e:
+        return jsonify({'html_output': f'<p>エラーが発生しました: {str(e)}</p>'})
+    
 if __name__ == '__main__':
     app.run(debug=True)
