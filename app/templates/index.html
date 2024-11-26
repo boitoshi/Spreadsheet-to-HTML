@@ -5,79 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask アプリ</title>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <style>
-        /* レイアウト関連 */
-        .display-area, 
-        .copy-area {
-            margin-bottom: 2em;
-        }
-
-        /* コピーエリアのスタイル */
-        .copy-area pre {
-            max-height: 300px;
-            overflow-x: auto;
-            background-color: #f8f9fa;
-            padding: 1em;
-            border: 1px solid #dee2e6;
-            border-radius: 0.25rem;
-            font-size: small;
-            width: auto;
-            max-width: 600px;
-        }
-
-        /* ローディング表示 */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #feedback {
-            margin: 1rem 0;
-        }
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap アイコン -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- カスタムCSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     
-        .form-group {
-            margin-bottom: 1rem;
-        }
-    
-        .btn {
-            margin-right: 0.5rem;
-        }
-
-        form {
-            margin-bottom: 2em;
-        }
-        
-        select, button {
-            margin: 0.5em;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <h1>シートとトレーナーを選択</h1>
         <form id="trainer_form" aria-label="HTMLジェネレーターフォーム">
-            <div class="form-group">
-                <label for="sheet_name">シート:</label>
-                <select id="sheet_name" name="sheet_name" class="form-control" aria-label="シート名を選択">
-                    {% for sheet in sheet_names %}
-                    <option value="{{ sheet }}">{{ sheet }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        
-            <div class="form-group">
-                <label for="trainer_name">トレーナー:</label>
-                <select id="trainer_name" name="trainer_name" class="form-control" required aria-label="トレーナー名を選択">
-                    <!-- トレーナー名のオプションがここに追加されます -->
-                </select>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <!-- <label for="sheet_name" class="form-label">シート:</label> -->
+                        <select id="sheet_name" name="sheet_name" class="form-select" aria-label="シート名を選択">
+                            <option value="" selected disabled>地方を選択</option>
+                            {% for sheet in sheet_names %}
+                            <option value="{{ sheet }}">{{ sheet }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <!-- <label for="trainer_name" class="form-label">トレーナー:</label> -->
+                        <select id="trainer_name" name="trainer_name" class="form-select" required aria-label="トレーナー名を選択">
+                            <option value="" selected disabled>トレーナー名を選択</option>
+                            <!-- トレーナー名のオプションがここに追加されます -->
+                        </select>
+                    </div>
+                </div>
             </div>
             
             <button type="submit" class="btn btn-primary" id="generate-btn">
@@ -86,29 +47,49 @@
             </button>
         </form>
 
-        <!-- フィードバック表示エリア -->
-        <div id="feedback" class="alert d-none" role="alert"></div>
-        
+        <!-- トーストのコンテナ -->
+        <div id="toast-container" class="d-flex justify-content-center align-items-center w-100;">
+            <!-- トーストメッセージがここに挿入される -->
+        </div>
+
+        <!-- コンテンツを並べる行 -->
         <div class="row">
-            <!-- 結果表示用のエリア -->
+            <!-- 左側カラム：表示サンプル -->
             <div id="result" class="col-md-6">
                 <h2>表示サンプル</h2>
-                <div class="loading-overlay d-none">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only">Loading...</span>
+                <div id="result-content" >
+                    <!-- ここに生成されたHTMLが表示される -->
+                    <div>
+                    <!-- <div class="spinner-border text-primary" role="status"> ローディングのぐるぐる -->
+                        <!-- <span class="sr-only">Loading...</span> -->
                     </div>
                 </div>
-                <!-- 生成されたHTMLがここに表示されます -->
             </div>
 
-            <!-- コピー用エリア -->
             <div class="copy-area col-md-6">
-                <h2>HTMLコードをコピー</h2>
-                <button onclick="copyCode()" class="btn btn-secondary mb-2">このコードをコピーする</button>
-                <pre><code id="code-block"></code></pre>
+                <h2>HTMLコード</h2>
+                <!-- ツールバーとコードブロックのコンテナ -->
+                <div class="code-container border rounded">
+                    <!-- ツールバー -->
+                    <div class="d-flex align-items-center bg-light ps-3 pe-2 py-0 border-bottom">
+                        <small class="font-monospace text-muted">HTML</small>
+                        <div class="d-flex ms-auto align-items-center">
+                            <button id="copy-btn" type="button" class="btn btn-sm p-1" aria-label="コピー">
+                                <i class="bi bi-clipboard"></i>
+                                <span class="visually-hidden">コードをコピー</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- コードブロック -->
+                    <pre class="m-0 p-3"><code id="code-block"></code></pre>
+                </div>
             </div>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Flaskテンプレートエンジン（Jinja2）の構文を使用して静的ファイルを参照している -->
+    <script src="{{ url_for('static', filename='js/main.js' ) }}"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

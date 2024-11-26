@@ -100,7 +100,7 @@ padding: 4px; /* パディングを小さく */
     html_output += "</tbody></table>"
 
     # スタイルシートとテーブルを結合
-    full_html_output = f"{stylesheet}{html_output}"
+    full_html_output = f"{html_output}{stylesheet}"
 
     # BeautifulSoupで整形　prettify()でインデントを整える
     soup = BeautifulSoup(full_html_output, 'html.parser')

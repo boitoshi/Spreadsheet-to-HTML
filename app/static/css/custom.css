@@ -1,0 +1,123 @@
+/* レイアウト関連のスタイル設定 */
+.display-area,
+.copy-area {
+    margin-bottom: 2em;
+}
+
+/* コピーエリアのスタイル */
+.copy-area pre {
+    max-height: 300px;
+    overflow-x: auto;
+    background-color: #f8f9fa;
+    padding: 1em;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    font-size: small;
+    width: auto;
+    max-width: 600px;
+}
+
+/* ローディング表示 */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} 
+
+#feedback {
+    margin: 1rem 0;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.btn {
+    margin-right: 0.5rem;
+}
+
+form {
+    margin-bottom: 2em;
+}
+
+select,
+button {
+    margin: 0.5em;
+}
+
+.code-container {
+    background-color: #f8f9fa;
+}
+
+.code-container .btn {
+    padding: 0.15rem 0.35rem;  /* ボタンのパディングを小さく */
+    color: #6c757d;
+    margin: 2px 0;  /* 上下の余白を微調整 */
+}
+
+.code-container .d-flex {
+    min-height: 28px;  /* ツールバーの高さを固定 */
+}
+.code-container .btn:hover {
+    color: #000;
+}
+
+.code-container pre {
+    background-color: #fff;
+    margin-bottom: 0;
+}
+
+/* トーストコンテナのスタイル */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1055;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 400px; /* 横幅を狭く設定 */
+    width: 100%;
+}
+
+/* トーストの基本スタイル */
+.toast.pop-toast {
+    border-radius: 0.75rem !important; /* 角を丸める */
+    background-color: rgba(0, 0, 0, 0.7) !important; /* 背景の透明度を調整 */
+    color: #fff !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    animation: toast-pop 0.3s ease-out;
+}
+
+/* トーストの種類別スタイル */
+.toast.pop-toast.text-bg-success {
+    background: rgba(25, 135, 84, 0.85) !important;
+}
+
+.toast.pop-toast.text-bg-info {
+    background: rgba(13, 202, 240, 0.85) !important;
+}
+
+.toast.pop-toast.text-bg-danger {
+    background: rgba(220, 53, 69, 0.85) !important;
+}
+
+
+/* アニメーション */
+@keyframes toast-pop {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
