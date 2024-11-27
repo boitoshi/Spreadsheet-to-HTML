@@ -1,3 +1,48 @@
+/* デフォルトのスタイル */
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* 画面幅が 992px 以下の場合のスタイル */
+@media (max-width: 992px) {
+    .container {
+        max-width: 720px;
+    }
+
+    /* 要素の最大幅と中央揃えを設定 */
+    .form-group,
+    .form-control,
+    .btn {
+        max-width: 500px; /* 適宜調整してください */
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* 共通のパディングとマージンを設定 */
+.shared-padding {
+    padding: 1rem; /* p-3 に相当 */
+    margin-bottom: 1rem; /* 下部のマージンを調整 */
+}
+
+/* 左側コンテナのカスタマイズ */
+#result-content {
+    background-color: #ffffff; /* 背景色を白に設定 */
+    /* 必要に応じて他のスタイルを追加 */
+}
+
+/* タイトルの中央揃え */
+#result h2, .copy-area h2 {
+    text-align: center;
+}
+
+/* コードコンテナの背景色調整 */
+.copy-area .code-container {
+    background-color: #f8f9fa;
+}
+
 /* レイアウト関連のスタイル設定 */
 .display-area,
 .copy-area {
