@@ -1,46 +1,47 @@
 from bs4 import BeautifulSoup
 
+# エントリのリストからHTMLテーブルを生成する関数
 def generate_html_table(entries):
-    """エントリのリストからHTMLテーブルを生成する関数"""
+    # スタイルシートテンプレート
     stylesheet = """
 <style>
 .table-elite-four {
-width: auto; /* ブラウザに合わせて適度に */
-max-width: 100%; /* 最大幅を100%に */
-border-collapse: collapse;
-font-size: 12px; /* テキストサイズを12pxに */
-margin: 0 auto; /* 中央揃え */
-text-align: center;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 0 auto;
+    text-align: center;
 }
 
-.table-elite-four th, .table-elite-four td {
-border: 1px solid #000; /* 罫線1px */
-padding: 8px;
+.table-elite-four th,
+.table-elite-four td {
+    border: 1px solid #000;
+    padding: 8px;
 }
 
 .table-elite-four th {
-background-color: #ffbd59;
+    background-color: #ffbd59;
 }
 
 .table-elite-four td {
-background-color: #fffaf2;
+    background-color: #fffaf2;
 }
 
-td ul {
-margin: 0;
-padding-left: 0;  /* 左側のパディングをリセット */
-list-style-position: inside;  /* リストのマーカー（•など）をテキストの内側に表示 */
+.table-elite-four ul {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
 }
 
 @media screen and (max-width: 600px) {
-.table-elite-four {
-width: 100%; /* モバイルでは幅を100%に */
-font-size: 10px; /* テキストサイズを小さく */
-}
+    .table-elite-four {
+        font-size: 10px;
+    }
 
-.table-elite-four th, .table-elite-four td {
-padding: 4px; /* パディングを小さく */
-}
+    .table-elite-four th,
+    .table-elite-four td {
+        padding: 4px;
+    }
 }
 </style>
 """
@@ -55,7 +56,7 @@ padding: 4px; /* パディングを小さく */
     for entry in entries:
         pokemon = entry['ポケモン']
         gender = entry.get('せいべつ', '')
-        if gender:
+        if gender and gender != "ふめい":
             pokemon += f"({gender})"
         html_output += f"<th><img src='path/to/{pokemon}.png alt='{pokemon}'></th>" # シングルクォートとダブルクォートの組み合わせ
     html_output += "</tr>"
@@ -65,8 +66,8 @@ padding: 4px; /* パディングを小さく */
     for entry in entries:
         pokemon = entry['ポケモン']
         gender = entry.get('せいべつ', '')
-        if gender:
-            pokemon += f"({gender})"
+        if gender and gender != "ふめい":
+            pokemon += f"<br>({gender})"
         html_output += f"<td>{pokemon}</td>"
     html_output += "</tr>"
 

@@ -5,17 +5,16 @@
     padding: 0 15px;
 }
 
-/* 画面幅が 992px 以下の場合のスタイル */
-@media (max-width: 992px) {
+/* モバイル・タブレット表示向け（768px未満） */
+@media (max-width: 767.98px) {
     .container {
-        max-width: 720px;
+        max-width: 100%;
     }
 
-    /* 要素の最大幅と中央揃えを設定 */
     .form-group,
     .form-control,
     .btn {
-        max-width: 500px; /* 適宜調整してください */
+        max-width: 100%;
         margin-left: auto;
         margin-right: auto;
     }
